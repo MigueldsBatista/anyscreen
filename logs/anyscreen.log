@@ -1,0 +1,36 @@
+2025-06-08 11:00:26.311 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application starting...
+2025-06-08 11:00:26.396 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Found 2 screens
+2025-06-08 11:00:26.400 [main] INFO  com.anyscreen.implementations.Log4jAdapter - [ScreenInfo{index=0, bounds=java.awt.Rectangle[x=0,y=0,width=1920,height=1080], isPrimary=true, deviceId=':0.0'}, ScreenInfo{index=1, bounds=java.awt.Rectangle[x=1920,y=0,width=1920,height=1080], isPrimary=false, deviceId=':0.1'}]
+2025-06-08 11:00:26.401 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Select the screen index to start recording: 
+2025-06-08 11:00:32.536 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Starting 5-second recording...
+2025-06-08 11:00:32.539 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder configured: media/demo_recording.mp4 (1920x1080@30fps)
+2025-06-08 11:00:32.556 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder started successfully
+2025-06-08 11:00:32.556 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen recorder started
+2025-06-08 11:00:32.559 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording started successfully
+2025-06-08 11:00:37.567 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder stopped and resources released
+2025-06-08 11:00:37.567 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen recorder stopped
+2025-06-08 11:00:37.567 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording stopped successfully
+2025-06-08 11:00:37.567 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording completed: demo_recording.mp4
+2025-06-08 11:00:37.568 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application finished
+2025-06-08 11:08:48.670 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application starting...
+2025-06-08 11:08:48.752 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Found 2 screens
+2025-06-08 11:08:48.757 [main] INFO  com.anyscreen.implementations.Log4jAdapter - [ScreenInfo{index=0, bounds=java.awt.Rectangle[x=0,y=0,width=1920,height=1080], isPrimary=true, deviceId=':0.0'}, ScreenInfo{index=1, bounds=java.awt.Rectangle[x=1920,y=0,width=1920,height=1080], isPrimary=false, deviceId=':0.1'}]
+2025-06-08 11:08:48.757 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Select the screen index to start recording: 
+2025-06-08 11:12:11.593 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application starting...
+2025-06-08 11:12:11.677 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen: 0 - 1920.0 x 1080.0 IsPriamary: true
+2025-06-08 11:12:11.678 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen: 1 - 1920.0 x 1080.0 IsPriamary: false
+2025-06-08 11:12:11.678 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Select the screen index to start recording: 
+2025-06-08 11:12:16.637 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Starting 5-second recording...
+2025-06-08 11:12:16.640 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder configured: media/demo_recording.mp4 (1920x1080@30fps)
+2025-06-08 11:12:16.662 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder started successfully
+2025-06-08 11:12:16.663 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen recorder started
+2025-06-08 11:12:16.665 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording started successfully
+2025-06-08 11:12:21.688 [main] INFO  com.anyscreen.implementations.Log4jAdapter - JavaCV encoder stopped and resources released
+2025-06-08 11:12:21.688 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen recorder stopped
+2025-06-08 11:12:21.688 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording stopped successfully
+2025-06-08 11:12:21.688 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Recording completed: demo_recording.mp4
+2025-06-08 11:12:21.688 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application finished
+2025-06-08 14:12:16.504 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Application starting...
+2025-06-08 14:12:16.607 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen: 0 - 1920.0 x 1080.0 IsPriamary: true
+2025-06-08 14:12:16.608 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Screen: 1 - 1920.0 x 1080.0 IsPriamary: false
+2025-06-08 14:12:16.608 [main] INFO  com.anyscreen.implementations.Log4jAdapter - Select the screen index to start recording: 
