@@ -1,7 +1,0 @@
-com/anyscreen/implementations/RobotScreenCapture.class
-com/anyscreen/interfaces/ScreenCaptureInterface.class
-com/anyscreen/implementations/Log4jAdapter.class
-com/anyscreen/interfaces/ScreenCaptureSaverInterface.class
-com/anyscreen/interfaces/LoggerInterface.class
-com/anyscreen/models/ScreenInfo.class
-com/anyscreen/exceptions/ScreenCaptureException.class
