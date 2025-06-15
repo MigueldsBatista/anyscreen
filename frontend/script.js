@@ -15,6 +15,12 @@ socket.onclose = function (event) {
 // Handle incoming offer
 async function handleIncomingOffer(offer, fromClientId) {
     console.log('Received offer from client:', fromClientId);
+    const isAllowed = confirm(`Do you want to accept incoming offer from client ${fromClientId}?`);
+    if (!isAllowed) {
+        console.log('Offer declined by user');
+        return;
+    }
+
     targetClientId = fromClientId;
     
     // Create peer connection first
@@ -124,9 +130,6 @@ let servers = {
 const init = async () =>{
     localStream = await navigator.mediaDevices.getUserMedia({audio: false, video: true});
     console.log("here?");
-    
-
-    document.getElementById('user-1').srcObject = localStream
 }
 
 let createPeerConnnection = async (sdbElement) =>{
@@ -159,26 +162,41 @@ let createPeerConnnection = async (sdbElement) =>{
 
 }
 
-let createOffer = async () =>{
-    targetClientId = prompt('Enter target client ID:');
-    if (!targetClientId) return;
-
-    await createPeerConnnection(offerTextArea);
-
-    let offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
+let createOffer = async (providedTargetClientId) => {
+    targetClientId = providedTargetClientId;
     
-    // Send offer via WebSocket
-    console.log('Sending offer to client:', targetClientId);
-    socket.send(JSON.stringify({
-        type: 'offer',
-        offer: offer,
-        to: targetClientId
-    }));
+    try {
+        await createPeerConnnection(offerTextArea);
+
+        let offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        // Send offer via WebSocket
+        console.log('Sending offer to client:', targetClientId);
+        socket.send(JSON.stringify({
+            type: 'offer',
+            offer: offer,
+            to: targetClientId
+        }));
+    } catch (error) {
+        console.error('Error creating offer:', error);
+    }
 }
 
-createOfferBtn.addEventListener('click', createOffer)
+createOfferBtn.addEventListener('click', () => createOffer())
 
 init();
 
+// Only create automatic offer if clientId is provided in URL
+const params = new URLSearchParams(document.location.search);
+console.log(params);
 
+const clientId = params.get('clientId');
+if (clientId) {
+    // Wait for socket connection before creating offer
+    console.log('preparing to offer ', clientId);
+    
+    socket.addEventListener('open', () => {
+        setTimeout(() => createOffer(clientId), 1000); // Small delay to ensure connection is stable
+    });
+}
