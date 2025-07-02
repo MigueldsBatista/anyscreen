@@ -1,0 +1,95 @@
+{
+  "project": {
+    "name": "anyscreen",
+    "version": "1.0.0",
+    "description": "Screen sharing application with WebRTC"
+  },
+  "server": {
+    "host": "localhost",
+    "port": 8080,
+    "protocol": "http",
+    "websocket": {
+      "enabled": true,
+      "port": 8080,
+      "path": "/ws"
+    }
+  },
+  "frontend": {
+    "dev": {
+      "port": 5173,
+      "host": "localhost"
+    },
+    "build": {
+      "outDir": "dist",
+      "assetsDir": "assets"
+    }
+  },
+  "webrtc": {
+    "iceServers": [
+      { "urls": "stun:stun.l.google.com:19302" },
+      { "urls": "stun:stun.l.google.com:5349" },
+      { "urls": "stun:stun1.l.google.com:3478" },
+      { "urls": "stun:stun1.l.google.com:5349" },
+      { "urls": "stun:stun2.l.google.com:19302" },
+      { "urls": "stun:stun2.l.google.com:5349" },
+      { "urls": "stun:stun3.l.google.com:3478" },
+      { "urls": "stun:stun3.l.google.com:5349" },
+      { "urls": "stun:stun4.l.google.com:19302" },
+      { "urls": "stun:stun4.l.google.com:5349" }
+    ],
+    "configuration": {
+      "iceTransportPolicy": "all",
+      "bundlePolicy": "balanced",
+      "rtcpMuxPolicy": "require"
+    }
+  },
+  "security": {
+    "cors": {
+      "enabled": true,
+      "allowedOrigins": [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:8080"
+      ]
+    },
+    "ssl": {
+      "enabled": false,
+      "keyPath": "",
+      "certPath": ""
+    }
+  },
+  "logging": {
+    "level": "info",
+    "file": "./logs/anyscreen.log",
+    "console": true,
+    "maxFileSize": "10MB",
+    "maxFiles": 5
+  },
+  "database": {
+    "type": "file",
+    "connection": {
+      "filename": "./data/anyscreen.db"
+    }
+  },
+  "features": {
+    "screenSharing": true,
+    "audioSharing": true,
+    "fileTransfer": false,
+    "chat": true,
+    "recording": false
+  },
+  "limits": {
+    "maxConnections": 100,
+    "maxRoomSize": 10,
+    "sessionTimeout": 3600000,
+    "messageSize": 1048576
+  },
+  "paths": {
+    "backend": "./backend",
+    "frontend": "./frontend",
+    "frontendLegacy": "./frontend_",
+    "docs": "./docs",
+    "logs": "./logs",
+    "data": "./data"
+  }
+}
