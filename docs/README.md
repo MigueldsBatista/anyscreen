@@ -1,105 +1,128 @@
-project-root/
-├── backend/
-│   ├── src/
-│   │   ├── main/java/com/yourapp/
-│   │   │   ├── capture/             # Screen capture logic
-│   │   │   ├── encoding/            # Frame encoding/compression logic
-│   │   │   ├── signaling/           # WebSocket signaling server
-│   │   │   ├── webrtc/              # Integration with WebRTC/GStreamer
-│   │   │   ├── api/                 # REST controllers
-│   │   │   ├── service/             # Application logic
-│   │   │   ├── model/               # Domain models/entities
-│   │   │   ├── config/              # Configuration (logging, WebSocket, etc)
-│   │   │   └── App.java             # Main entry point
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── logback.xml
-│   └── pom.xml                      # Maven config
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── views/
-│   │   ├── App.vue
-│   │   └── main.js
-│   ├── package.json
-│   └── vite.config.js
-│
-└── docs/                            # Specs, diagrams, flowcharts
+# Fluxo de Funcionamento do Sistema
 
-## 🧱 Entities and Responsibilities
+## 1. Host inicia o app
+**Servidor Node local rodando** — capaz de:
+- Gerar e armazenar um roomId único
+- Criar os endpoints `setup-room` e `teardown-room`
+- Manter o roomId e a conexão WebSocket do host em memória (no backend e no vuex)
 
-| Module | Description |
-|--------|-------------|
-| ScreenCaptureService | Captures screen frames with Robot, sends to encoder. |
-| FrameEncoder | Encodes to MJPEG or H.264 (via external tool). |
-| WebSocketSignalingServer | Accepts signaling from frontend (offer/answer/ICE). |
-| WebRTCStreamer | Sends media stream to peer (via GStreamer, FFmpeg or RTP). |
-| StreamSession | Tracks connected clients, stream state. |
-| CaptureController | REST/WebSocket controller to start/stop streams. |
+**Interface do host** — exibe o link gerado para compartilhar.
 
-## 🧠 Design Patterns to Apply
+**Mecanismo de WebSocket** configurado para comunicação bidirecional entre host e servidor.
 
-### 1. Strategy Pattern
-Use for interchangeable encoding strategies:
+## 2. Host compartilha link e convidado abre no navegador
+**Servidor Node** que escuta requisições HTTP na rota `/{roomId}`.
 
-```java
-public interface FrameEncoder {
-    byte[] encode(BufferedImage frame);
-}
-public class MJPEGEncoder implements FrameEncoder { ... }
-public class H264Encoder implements FrameEncoder { ... }
+**Validação do roomId** — rejeitar conexões inválidas.
+
+**Página cliente (guest)** carregada no navegador:
+- Cliente web com código para conectar via WebSocket
+- Interface que permite enviar requisição para entrar na sala
+
+## 3. Servidor valida ID, permite conexão e envia convite para host
+**WebSocket server** que:
+- Recebe conexão do guest
+- Verifica se o roomId existe e está ativo
+- Envia notificação (mensagem) para o host informando que alguém quer entrar
+
+**Host interface**:
+- Recebe mensagem via WebSocket
+- Apresenta opção para aceitar ou recusar o convidado
+
+## 4. Host aceita ou recusa
+**Host envia mensagem via WebSocket ao servidor**:
+- **Aceitar**: sinaliza para o guest que pode iniciar conexão
+- **Recusar**: encerra tentativa de conexão
+
+**Servidor** repassa decisão para o guest.
+
+## 5. Estabelecimento da conexão WebRTC
+**Host**:
+- Captura tela via `getDisplayMedia`
+- Cria `RTCPeerConnection`
+- Adiciona stream capturado
+- Cria oferta SDP e envia via WebSocket para guest
+
+**Guest**:
+- Recebe oferta via WebSocket
+- Cria resposta SDP
+- Envia resposta via WebSocket para host
+
+**Ambos**:
+- Troca de candidatos ICE via WebSocket
+- Estabelecem conexão ponto a ponto
+
+## 6. Transmissão ponto a ponto da tela
+- **Host** envia vídeo da tela capturada diretamente para o guest via WebRTC
+- **Guest** recebe e exibe o vídeo em elemento `<video>`
+- **Servidor Node** atua apenas como canal de sinalização, não passando mídia
+
+## Implementação do Sistema de Rotas
+
+### Rotas distintas para host e guest
+**Exemplo:**
+- Host: `/host/:roomId`
+- Guest: `/room/:roomId`
+
+### Componentes dedicados para cada rota
+Cada rota carrega um componente específico:
+- `/host/:roomId` → `HostView.vue`
+- `/room/:roomId` → `GuestView.vue`
+
+### Benefícios
+- Sem ifs no código — a distinção é feita automaticamente pelo roteador
+- Código separado por responsabilidade
+
+### Exemplo de configuração com Vue Router
+
+```js
+const routes = [
+    {
+        path: '/host',
+        name: 'Host',
+        component: HostView,
+    },
+    {
+        path: '/room/:roomId',
+        name: 'GuestRoom',
+        component: GuestView,
+        props: true,
+    }
+];
 ```
 
-### 2. Observer Pattern
-Used to notify listeners when a new frame is captured:
+## Sistema de Validação de RoomID
 
-```java
-interface FrameListener {
-    void onFrame(byte[] encodedFrame);
-}
-```
+### 1. Como e onde validar um roomId?
+- **No servidor**: validação principal e autoritária
+- **No cliente**: validação preliminar para feedback rápido, mas não confiável
 
-### 3. Command Pattern
-Used for handling WebSocket commands (start, stop, etc.)
+### 2. O que validar?
+- Se o roomId existe no servidor
+- Se o roomId está ativo (host conectado e sala não encerrada)
+- Se o guest/host tem permissão para acessar a sala (autenticação/autorização, se houver)
+- Evitar sala inválida, expiradas ou rooms "fantasmas"
 
-```java
-interface Command {
-    void execute();
-}
-class StartStreamCommand implements Command { ... }
-class StopStreamCommand implements Command { ... }
-```
+### 3. Como validar?
 
-### 4. Factory Pattern
-To instantiate different WebRTC or encoder configurations.
+**No servidor**:
+- Armazenar rooms ativos: manter um registro (em memória, banco, cache) com roomId e seu estado
+- Na requisição do guest/host: quando receber o pedido para entrar na sala, verificar se o roomId está ativo
+- Resposta: aceitar ou rejeitar o pedido (com mensagem clara)
 
-### 5. Builder Pattern
-For building complex SDP/WebRTC session configs or GStreamer pipelines.
+**No cliente**:
+- Antes de tentar conectar, pode chamar uma API para verificar se o roomId existe (opcional)
+- Ou tentar conexão e reagir ao retorno de erro do servidor
 
-## 🔁 Integration Points
+### 4. Exemplo de fluxo de validação
+1. Guest entra no link `/room/:roomId`
+2. Cliente pode fazer requisição ao servidor: `GET /validate-room/:roomId`
+3. Servidor responde:
+     - `200 OK` + dados da sala se válido
+     - `404` / `400` se inválido ou não ativo
+4. Se válido, cliente conecta via WebSocket/socket.io para entrar na sala
+5. Se inválido, mostra mensagem de erro no cliente
 
-| Component | How it talks | Notes |
-|-----------|-------------|-------|
-| Java ↔ Frontend | WebSocket | For signaling |
-| Java ↔ Media Server | RTP / GStreamer / FFmpeg | Encode/send frames |
-| Frontend ↔ Java | WebSocket + REST | Control and feedback |
-| Frontend (Vue) | WebRTC API | Receives media |
-
-## 📌 Example Class Mapping
-
-- **ScreenCaptureService**: ⬅️ Singleton (or managed by DI)
-- **WebSocketHandler**: ⬅️ Observer + Command
-- **StreamSession**: ⬅️ Aggregate root for user stream state
-- **StreamController**: ⬅️ REST interface
-- **GStreamerPipelineBuilder**: ⬅️ Builder
-
-## ✅ Optional Enhancements
-
-- Use SLF4J + Logback for structured logs
-- Use Jackson for JSON parsing
-- Add unit tests for Command, Service, and Encoder modules
-- **Future**: replace GStreamer with native WebRTC media track via JNI if needed
-
-If you want, I can generate some boilerplate for this structure (ex: the Command dispatcher, WebSocket handler skeleton, etc). Want that next?
+### 5. Segurança adicional
+- Implementar tokens temporários vinculados ao roomId para evitar acesso indevido
+- Caso use autenticação, validar permissões no servidor
